@@ -2,7 +2,7 @@ package com.adobe.phonegap.push
 
 import android.annotation.SuppressLint
 import android.util.Log
-import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 
 /**
@@ -22,14 +22,15 @@ class PushInstanceIDListenerService : FirebaseMessagingService() {
    */
   override fun onNewToken(token: String) {
     super.onNewToken(token)
-    FirebaseInstanceId.getInstance().instanceId
-      .addOnSuccessListener { instanceIdResult ->
-        // Get updated InstanceID token.
-        val refreshedToken = instanceIdResult.token
-        Log.d(TAG, "Refreshed token: $refreshedToken")
+    FirebaseMessaging.getInstance().token.addOnSuccessListener { result ->
+        if(result != null) {
+            val refreshedToken : String = result
+            Log.d(TAG, "Refreshed token: $refreshedToken")
+            // DO your thing with your firebase token
 
-        // TODO: Implement this method to send any registration to your app's servers.
-        //sendRegistrationToServer(refreshedToken);
-      }
+            // TODO: Implement this method to send any registration to your app's servers.
+            //sendRegistrationToServer(refreshedToken);
+        }
+    }
   }
 }

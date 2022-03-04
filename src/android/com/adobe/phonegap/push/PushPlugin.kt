@@ -16,8 +16,8 @@ import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.installations.FirebaseInstallations
 import me.leolin.shortcutbadger.ShortcutBadger
 import org.apache.cordova.*
 import org.json.JSONArray
@@ -461,34 +461,25 @@ class PushPlugin : CordovaPlugin() {
         Log.v(TAG, formatLogMessage("JSONObject=$jo"))
         Log.v(TAG, formatLogMessage("senderID=$senderID"))
 
-        try {
-          token = FirebaseInstanceId.getInstance().token
-        } catch (e: IllegalStateException) {
-          Log.e(TAG, formatLogMessage("Firebase Token Exception ${e.message}"))
-        }
+        FirebaseMessaging.getInstance().token.addOnSuccessListener { result ->
+            if(result != null) {
+                token = result
 
-        if (token == null) {
-          try {
-            token = FirebaseInstanceId.getInstance().getToken(senderID, PushConstants.FCM)
-          } catch (e: IllegalStateException) {
-            Log.e(TAG, formatLogMessage("Firebase Token Exception ${e.message}"))
-          }
-        }
+                if (token != "") {
+                  val registration = JSONObject().put(PushConstants.REGISTRATION_ID, token).apply {
+                    put(PushConstants.REGISTRATION_TYPE, PushConstants.FCM)
+                  }
 
-        if (token != "") {
-          val registration = JSONObject().put(PushConstants.REGISTRATION_ID, token).apply {
-            put(PushConstants.REGISTRATION_TYPE, PushConstants.FCM)
-          }
+                  Log.v(TAG, formatLogMessage("onRegistered=$registration"))
 
-          Log.v(TAG, formatLogMessage("onRegistered=$registration"))
+                  val topics = jo.optJSONArray(PushConstants.TOPICS)
+                  subscribeToTopics(topics)
 
-          val topics = jo.optJSONArray(PushConstants.TOPICS)
-          subscribeToTopics(topics)
-
-          sendEvent(registration)
-        } else {
-          callbackContext.error("Empty registration ID received from FCM")
-          return@Runnable
+                  sendEvent(registration)
+                } else {
+                  callbackContext.error("Empty registration ID received from FCM")
+                }
+            }
         }
       } catch (e: JSONException) {
         Log.e(TAG, formatLogMessage("JSON Exception ${e.message}"))
@@ -612,7 +603,7 @@ class PushPlugin : CordovaPlugin() {
         if (topics != null) {
           unsubscribeFromTopics(topics)
         } else {
-          FirebaseInstanceId.getInstance().deleteInstanceId()
+          FirebaseInstallations.getInstance().delete()
           Log.v(TAG, formatLogMessage("UNREGISTER"))
 
           /**
