@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android"
-  id="@havesource/cordova-plugin-push" version="3.0.1">
+  id="@havesource/cordova-plugin-push" version="4.0.0">
 
   <name>Cordova Push Plugin</name>
   <description>Enable receiving push notifications on Android, iOS and Windows devices. Android uses Firebase Cloud Messaging. iOS uses Apple APNS Notifications. Windows uses Microsoft WNS Notifications.</description>
@@ -32,6 +32,8 @@
       <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
       <uses-permission android:name="android.permission.WAKE_LOCK"/>
       <uses-permission android:name="android.permission.VIBRATE"/>
+      <uses-permission android:name="${applicationId}.permission.PushHandlerActivity"/>
+      <permission android:name="${applicationId}.permission.PushHandlerActivity" android:protectionLevel="signature"></permission>
     </config-file>
 
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
@@ -46,15 +48,9 @@
       <receiver android:name="com.adobe.phonegap.push.BackgroundActionButtonHandler"/>
       <receiver android:name="com.adobe.phonegap.push.PushDismissedHandler"/>
 
-      <service android:name="com.adobe.phonegap.push.FCMService">
+      <service android:name="com.adobe.phonegap.push.FCMService" android:exported="true">
         <intent-filter>
           <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-        </intent-filter>
-      </service>
-
-      <service android:name="com.adobe.phonegap.push.PushInstanceIDListenerService">
-        <intent-filter>
-          <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
         </intent-filter>
       </service>
     </config-file>
@@ -65,11 +61,11 @@
       <preference name="GradlePluginGoogleServicesVersion" value="4.3.8" />
 
       <preference name="GradlePluginKotlinEnabled" value="true" />
-      <preference name="GradlePluginKotlinVersion" value="1.6.10" />
+      <preference name="GradlePluginKotlinVersion" value="1.5.20" />
     </config-file>
 
     <preference name="ANDROIDX_CORE_VERSION" default="1.6.+"/>
-    <preference name="FCM_VERSION" default="18.+"/>
+    <preference name="FCM_VERSION" default="23.+"/>
 
     <framework src="androidx.core:core:$ANDROIDX_CORE_VERSION" />
     <framework src="me.leolin:ShortcutBadger:1.1.22@aar"/>
@@ -79,7 +75,6 @@
     <source-file src="src/android/com/adobe/phonegap/push/PushConstants.kt" target-dir="java/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushHandlerActivity.kt" target-dir="java/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/BackgroundHandlerActivity.kt" target-dir="java/com/adobe/phonegap/push/"/>
-    <source-file src="src/android/com/adobe/phonegap/push/PushInstanceIDListenerService.kt" target-dir="java/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushPlugin.kt" target-dir="java/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/BackgroundActionButtonHandler.kt" target-dir="java/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushDismissedHandler.kt" target-dir="java/com/adobe/phonegap/push/"/>
@@ -97,7 +92,7 @@
   </platform>
 
   <platform name="ios">
-    <preference name="IOS_FIREBASE_MESSAGING_VERSION" default="~> 6.32.2"/>
+    <preference name="IOS_FIREBASE_MESSAGING_VERSION" default="~> 8.1.1"/>
 
     <config-file target="config.xml" parent="/*">
       <feature name="PushNotification">

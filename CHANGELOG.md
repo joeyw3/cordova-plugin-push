@@ -1,5 +1,22 @@
 # Change Log
 
+## 3.0.1
+
+**Fixes:**
+
+* fix(android): add service exported flags w/ intent-filter (#173)
+* fix(android): processPushBundle flipped returned value (#160)
+* fix: doc typo (#159)
+
+**Chores:**
+
+* chore: correct Bower metadata to MIT license (#166)
+* chore(npm): rebuilt package-lock.json & fix audit
+
+**Docs:**
+
+* doc: add 2.x and 3.x to PLATFORM_SUPPORT.md
+
 ## 3.0.0
 
 **Overview:**
